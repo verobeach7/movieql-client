@@ -78,12 +78,10 @@ export default function Movie() {
       fragment: gql`
         # fragment 내가원하는명칭 on 객체타입 {}
         fragment MovieFragment on Movie {
-          title
           isLiked
         }
       `,
       data: {
-        title: "Hello",
         isLiked: !data.movie.isLiked,
       },
     });
