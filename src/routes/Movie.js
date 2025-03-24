@@ -3,16 +3,13 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 
 const GET_MOVIE = gql`
-  # getMovie는 적어도 되고 안 적어도 됨
-  # argument gql 문법으로 삽입
   query getMovie($movieId: String!) {
     movie(id: $movieId) {
       id
       title
-      # allMovies에서 이미 각 movie의 id와 title을 불러와 캐시해 놓았음
-      # 나중에 GET_MOVIE 쿼리에 새로운 data(field)가 추가되면 기존 캐시에 새로운 데이터만 추가함
       medium_cover_image
       rating
+      isLiked @client # Local-only field로 설정하기 위해서는 단지 @client만 뒤에 붙여주면 됨
     }
   }
 `;
@@ -58,9 +55,7 @@ const Image = styled.div`
 
 export default function Movie() {
   const { id } = useParams();
-  // 쿼리 호출 시는 GET_MOVIE로 접근
   const { data, loading } = useQuery(GET_MOVIE, {
-    // 변수 전달
     variables: {
       movieId: id,
     },
@@ -70,6 +65,7 @@ export default function Movie() {
       <Column>
         <Title>{loading ? "Loading..." : `${data.movie?.title}`}</Title>
         <Subtitle>⭐️ {data?.movie?.rating}</Subtitle>
+        <button>{data?.movie?.isLiked ? "Unlike" : "Like"}</button>
       </Column>
       <Image bg={data?.movie?.medium_cover_image} />
     </Container>
