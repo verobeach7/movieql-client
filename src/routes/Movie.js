@@ -55,17 +55,47 @@ const Image = styled.div`
 
 export default function Movie() {
   const { id } = useParams();
-  const { data, loading } = useQuery(GET_MOVIE, {
+  // cache에 접근하기 위해서 client를 불러와야 함
+  // const client = useApolloClient();
+  // 위처럼 client를 가져오면 또 다른 useApolloClient()를 import 해야 함
+  // useQuery에도 client를 가져올 수 있음
+  const {
+    data,
+    loading,
+    client: { cache },
+  } = useQuery(GET_MOVIE, {
     variables: {
       movieId: id,
     },
   });
+  // Click Handler
+  const onClick = () => {
+    // Fragment는 타입의 일부
+    cache.writeFragment({
+      // cache에서 수정하고 싶은 객체가 무엇인지 알아내기 위해 id 사용
+      id: `Movie:${id}`,
+      // Movie 타입의 어떤 조각을 변경할 것인지 지정
+      fragment: gql`
+        # fragment 내가원하는명칭 on 객체타입 {}
+        fragment MovieFragment on Movie {
+          title
+          isLiked
+        }
+      `,
+      data: {
+        title: "Hello",
+        isLiked: !data.movie.isLiked,
+      },
+    });
+  };
   return (
     <Container>
       <Column>
         <Title>{loading ? "Loading..." : `${data.movie?.title}`}</Title>
         <Subtitle>⭐️ {data?.movie?.rating}</Subtitle>
-        <button>{data?.movie?.isLiked ? "Unlike" : "Like"}</button>
+        <button onClick={onClick}>
+          {data?.movie?.isLiked ? "Unlike" : "Like"}
+        </button>
       </Column>
       <Image bg={data?.movie?.medium_cover_image} />
     </Container>
