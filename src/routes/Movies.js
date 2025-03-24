@@ -1,4 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
+import { Link } from "react-router-dom";
 
 const ALL_MOVIES = gql`
   # allMovies라고 해도 되고 getMovies라고 해도 potato라고 해도 됨. 아예 쓰지 않아도 상관 없음
@@ -28,7 +29,9 @@ export default function Movies() {
   return (
     <ul>
       {data.allMovies.map((movie) => (
-        <li key={movie.id}>{movie.title}</li>
+        <li key={movie.id}>
+          <Link to={`/movies/${movie.id}`}>{movie.title}</Link>
+        </li>
       ))}
     </ul>
   );
